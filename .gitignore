@@ -45,3 +45,5 @@ logs/
 *.db
 tmp/
 temp/
+#json
+tools.json
