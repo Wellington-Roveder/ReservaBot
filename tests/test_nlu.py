@@ -1,65 +1,93 @@
-import importlib.util
-import os
-
 import pytest
 
-# Dynamically load SemanticNLU from the file (avoids package import issues with double .py extension)
-_project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-_nlu_path = os.path.join(_project_root, "services", "nlu_config", "nlu.py.py")
-_spec = importlib.util.spec_from_file_location("nlu_mod", _nlu_path)
-_nlu_mod = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_nlu_mod)
-SemanticNLU = _nlu_mod.SemanticNLU
+from services.nlu_config.nlu import SemanticNLU
+
+THRESHOLD = 0.65
 
 
-# Fixture to provide a SemanticNLU instance (model loaded)
-@pytest.fixture
+# scope="module": o modelo de embeddings é carregado uma vez, não a cada teste.
+@pytest.fixture(scope="module")
 def nlu():
-    # threshold padrão usado na classe
-    return SemanticNLU(threshold=0.65)
+    return SemanticNLU(threshold=THRESHOLD)
 
 
 class TestSemanticNLU:
-    def test_classify_greeting(self, nlu):
-        """Saudações devem ser classificadas como 'saudacao'."""
-        result = nlu.classificar("olá")
+    @pytest.mark.parametrize(
+        "texto", ["olá", "oi", "bom dia", "boa tarde", "boa noite"]
+    )
+    def test_classify_greeting(self, nlu, texto):
+        result = nlu.classificar(texto)
         assert result["intent"] == "saudacao"
         assert result["in_scope"] is True
+        assert result["confidence"] >= THRESHOLD
 
-    def test_classify_booking_request(self, nlu):
-        """Pedidos de reserva devem ser classificados como 'fazer_reserva'."""
-        result = nlu.classificar("quero reservar uma mesa")
+    @pytest.mark.parametrize(
+        "texto",
+        [
+            "quero reservar uma mesa",
+            "gostaria de fazer uma reserva para hoje à noite",
+            "tem mesa pra 4 pessoas amanhã?",
+            "preciso de uma mesa para sábado",
+        ],
+    )
+    def test_classify_booking_request(self, nlu, texto):
+        result = nlu.classificar(texto)
         assert result["intent"] == "fazer_reserva"
         assert result["in_scope"] is True
 
-    def test_classify_cancel_request(self, nlu):
-        """Pedidos de cancelamento devem ser 'alterar_cancelar_reserva'."""
-        result = nlu.classificar("quer cancelar minha reserva")
+    @pytest.mark.parametrize(
+        "texto",
+        [
+            "quero cancelar minha reserva",
+            "preciso cancelar a reserva de amanhã",
+            "quero alterar o horário da minha reserva",
+        ],
+    )
+    def test_classify_cancel_request(self, nlu, texto):
+        result = nlu.classificar(texto)
         assert result["intent"] == "alterar_cancelar_reserva"
         assert result["in_scope"] is True
 
-    def test_classify_query_reservation(self, nlu):
-        """Consultas de reserva devem ser 'consultar_reserva'."""
-        result = nlu.classificar("quero ver minha reserva")
+    @pytest.mark.parametrize(
+        "texto",
+        [
+            "quero ver minha reserva",
+            "qual o horário da minha reserva?",
+            "consultar minhas reservas",
+        ],
+    )
+    def test_classify_query_reservation(self, nlu, texto):
+        result = nlu.classificar(texto)
         assert result["intent"] == "consultar_reserva"
         assert result["in_scope"] is True
 
-    def test_classify_out_of_scope(self, nlu):
-        """Frases fora do domínio devem retornar 'fora_de_escopo'."""
-        result = nlu.classificar("qual o tempo em são paulo?")
+    @pytest.mark.parametrize(
+        "texto",
+        [
+            "qual o tempo em são paulo?",
+            "quem ganhou o jogo ontem?",
+            "me conta uma piada",
+            "qual a capital da França?",
+        ],
+    )
+    def test_classify_out_of_scope(self, nlu, texto):
+        result = nlu.classificar(texto)
         assert result["intent"] == "fora_de_escopo"
         assert result["in_scope"] is False
-        assert result["confidence"] < 0.65
+        # Sem assert de confiança: com a rota fora_de_escopo, a confiança alta
+        # significa "tenho certeza que é fora do assunto".
 
-    def test_classify_with_threshold(self, nlu):
-        """Classificação acima do threshold deve ser aceita."""
-        result = nlu.classificar("bom dia")
-        # 'saudacao' should be above threshold
-        assert result["confidence"] >= 0.65
-        assert result["intent"] == "saudacao"
+    @pytest.mark.parametrize("texto", ["", "   ", "\n\t"])
+    def test_classify_empty_or_blank(self, nlu, texto):
+        result = nlu.classificar(texto)
+        assert result["intent"] == "fora_de_escopo"
+        assert result["in_scope"] is False
 
-    def test_classify_empty_string(self, nlu):
-        """Texto vazio deve retornar fora de escopo."""
-        result = nlu.classificar("")
+    def test_threshold_acima_da_confianca_rejeita_frase_valida(self, nlu):
+        """Subir o threshold acima da confiança obtida deve tornar a frase fora de escopo."""
+        frase = "quero reservar uma mesa"
+        confianca = nlu.classificar(frase)["confidence"]
+        rigido = SemanticNLU(threshold=confianca + 0.01)
+        result = rigido.classificar(frase)
         assert result["intent"] == "fora_de_escopo"
         assert result["in_scope"] is False
