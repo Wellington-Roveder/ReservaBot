@@ -1,0 +1,121 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "listar_mesas",
+      "description": "Lista todas as mesas cadastradas no restaurante, exibindo o ID, a capacidade e o status atual de cada uma. Lista a estrutura física das mesas cadastradas no restaurante. Não verifica disponibilidade de horários; para checar vagas em data e hora específicas, use buscar_mesas_livres",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "buscar_mesas_livres",
+      "description": "Busca mesas disponíveis para reserva em uma data, horário e quantidade de pessoas específicos.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "string",
+            "description": "Data desejada para a reserva no formato AAAA-MM-DD (ex: 2026-11-20)."
+          },
+          "horario": {
+            "type": "string",
+            "description": "Horário desejado no formato HH:MM (ex: 19:30)."
+          },
+          "numero_pessoas": {
+            "type": "integer",
+            "description": "Quantidade total de pessoas que vão ocupar a mesa."
+          }
+        },
+        "required": ["data", "horario", "numero_pessoas"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "criar_reserva",
+      "description": "Registra uma nova reserva no banco de dados para uma mesa específica e retorna os dados confirmados.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "mesa_id": {
+            "type": "integer",
+            "description": "O ID numérico da mesa escolhida (obtido previamente ao buscar mesas livres)."
+          },
+          "nome_cliente": {
+            "type": "string",
+            "description": "Nome completo do cliente responsável pela reserva."
+          },
+          "telefone": {
+            "type": "string",
+            "description": "Telefone de contato do cliente (apenas números com DDD, ex: 11999998888)."
+          },
+          "data": {
+            "type": "string",
+            "description": "Data da reserva no formato AAAA-MM-DD."
+          },
+          "horario": {
+            "type": "string",
+            "description": "Horário da reserva no formato HH:MM."
+          },
+          "numero_pessoas": {
+            "type": "integer",
+            "description": "Quantidade total de pessoas para a reserva."
+          }
+        },
+        "required": [
+          "mesa_id",
+          "nome_cliente",
+          "telefone",
+          "data",
+          "horario",
+          "numero_pessoas"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "buscar_reservas_cliente",
+      "description": "Lista as reservas ativas de um cliente a partir do seu número de telefone para consulta ou para obter o ID antes de cancelar.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "telefone": {
+            "type": "string",
+            "description": "Telefone do cliente cadastrado na reserva. (apenas números com DDD, ex: 11999998888)."
+          }
+        },
+        "required": ["telefone"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "cancelar_reserva",
+      "description": "Cancela uma reserva existente no sistema validando o ID da reserva e o telefone do titular.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "reserva_id": {
+            "type": "integer",
+            "description": "O número identificador único da reserva a ser cancelada."
+          },
+          "telefone": {
+            "type": "string",
+            "description": "Telefone do titular da reserva para validação de segurança.(apenas números com DDD, ex: 11999998888)."
+          }
+        },
+        "required": ["reserva_id", "telefone"]
+      }
+    }
+  }
+]
