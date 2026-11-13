@@ -1,9 +1,9 @@
+import os
 import sqlite3
 import threading
 from contextlib import contextmanager
-import os
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 
 load_dotenv()
 

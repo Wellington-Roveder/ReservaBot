@@ -57,18 +57,23 @@ def listar_mesas():
 
 # --- LEITURA (READ) ---
 def buscar_mesas_livres(data: str, horario: str, numero_pessoas: int) -> list[dict]:
+    # Junta data e hora no Python para formar 'AAAA-MM-DD HH:MM'
+    data_hora_busca = f"{data} {horario}"
+
     with db.cursor() as cur:
         cur.execute(
-            """SELECT id, capacidade FROM mesas
-               WHERE status = 'disponivel'
-                 AND capacidade >= ?
-                 AND id NOT IN (
-                     SELECT mesa_id FROM reservas
-                     WHERE data = ?
-                       AND time(horario) BETWEEN time(?, '-2 hours') AND time(?, '+2 hours')
+            """SELECT id, capacidade FROM mesas m
+               WHERE m.status = 'disponivel'
+                 AND m.capacidade >= ?
+                 AND NOT EXISTS (
+                     SELECT 1 
+                     FROM reservas r 
+                     WHERE r.mesa_id = m.id 
+                       AND datetime(r.data || ' ' || r.horario) BETWEEN datetime(?, '-2 hours') 
+                                                                    AND datetime(?, '+2 hours')
                  )
                ORDER BY capacidade ASC""",
-            (numero_pessoas, data, horario, horario),
+            (numero_pessoas, data_hora_busca, data_hora_busca),
         )
         mesas = cur.fetchall()
 
