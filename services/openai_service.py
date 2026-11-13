@@ -71,44 +71,41 @@ class OpenAISystem:
         max_iteracoes = 5
         iteracoes = 0
 
-        try:
-            while iteracoes < max_iteracoes:
-                iteracoes += 1
+        while iteracoes < max_iteracoes:
+            iteracoes += 1
 
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=mensagens_envio,
-                    tools=self.tools,
-                    tool_choice="auto",
-                    temperature=0.3,
-                    max_tokens=500,
-                )
-                mensagem_ia = response.choices[0].message
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=mensagens_envio,
+            tools=self.tools,
+            tool_choice="auto",
+            temperature=0.3,
+            max_tokens=500,
+        )
+        mensagem_ia = response.choices[0].message
 
-                if not mensagem_ia.tool_calls:
-                    return mensagem_ia.content
+        if not mensagem_ia.tool_calls:
+            return mensagem_ia.content
 
-                mensagens_envio.append(mensagem_ia)
+        mensagens_envio.append(mensagem_ia)
 
-                for tool_call in mensagem_ia.tool_calls:
-                    name = tool_call.function.name
-                    args = json.loads(tool_call.function.arguments)
+        for tool_call in mensagem_ia.tool_calls:
+            name = tool_call.function.name
+            args = json.loads(tool_call.function.arguments)
 
-                    funcao = mapa_funcoes.get(name)
-                    if funcao:
-                        resultado = funcao(**args)
-                    else:
-                        resultado = {"erro": f"Função '{name}' não encontrada."}
+            funcao = mapa_funcoes.get(name)
+            if funcao:
+                resultado = funcao(**args)
+            else:
+                resultado = {"erro": f"Função '{name}' não encontrada."}
 
-                    mensagens_envio.append(
-                        {
-                            "role": "tool",
-                            "tool_call_id": tool_call.id,
-                            "name": name,
-                            "content": json.dumps(resultado, ensure_ascii=False),
-                        }
-                    )
+            mensagens_envio.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "name": name,
+                    "content": json.dumps(resultado, ensure_ascii=False),
+                }
+            )
 
-            return "Desculpe, atingi o limite de tentativas para processar sua solicitação. Pode tentar novamente?"
-        except Exception:
-            raise
+        return "Desculpe, atingi o limite de tentativas para processar sua solicitação. Pode tentar novamente?"
