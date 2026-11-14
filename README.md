@@ -2,7 +2,7 @@
 
 Agente conversacional para gestão de reservas de restaurante. O sistema permite **criar, consultar e cancelar reservas** por linguagem natural, com persistência em SQLite e observabilidade em tempo real da classificação semântica e do estado do banco.
 
-[Acessar Demonstração ao Vivo](LINK_AQUI)
+[Acessar a demonstração ao vivo](https://reservas-wellingtonroveder.streamlit.app/)
 
 ## Visão geral
 
