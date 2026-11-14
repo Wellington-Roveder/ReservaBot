@@ -49,4 +49,4 @@ temp/
 
 *.db
 *.db-wal
-*.db-shm
+*.db-shmdiagnostico_nlu.py
