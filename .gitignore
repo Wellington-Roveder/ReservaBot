@@ -46,7 +46,7 @@ logs/
 tmp/
 temp/
 
-
+*.db-shm
 *.db
 *.db-wal
 *.db-shmdiagnostico_nlu.py
