@@ -1,0 +1,92 @@
+{
+  "fazer_reserva": [
+    "quero reservar uma mesa",
+    "gostaria de agendar para hoje à noite",
+    "tem vaga para 4 pessoas amanhã?",
+    "marcar um jantar",
+    "fazer uma reserva no restaurante",
+    "quero garantir um lugar para sábado",
+    "preciso de uma mesa para dois",
+    "como faço para reservar?",
+    "tem mesa disponível sexta?",
+    "bota meu nome na lista para hoje"
+  ],
+  "alterar_cancelar_reserva": [
+    "quero cancelar minha reserva",
+    "não vou conseguir ir mais, desmarca por favor",
+    "preciso mudar o horário do meu agendamento",
+    "alterar a quantidade de pessoas na reserva",
+    "desmarcar mesa",
+    "surgiu um imprevisto e não vou poder ir",
+    "consigo trocar o dia da minha reserva?",
+    "quero remarcar meu jantar",
+    "cancela o agendamento no meu nome",
+    "preciso diminuir o número de convidados"
+  ],
+  "consultar_reserva": [
+    "quero ver minha reserva",
+    "confirmar meu horário agendado",
+    "já está reservado no meu nome?",
+    "consultar agendamento",
+    "quais são os detalhes da minha reserva?",
+    "que horas está marcado mesmo?",
+    "verificar se minha mesa está confirmada",
+    "esqueci o horário que reservei",
+    "a que horas é a minha reserva?",
+    "qual a data e o horário que eu marquei?",
+    "me lembra o horário do meu agendamento",
+    "que dia está marcada a minha mesa?",
+    "pode me informar os dados da minha reserva?",
+    "para quantas pessoas está a minha reserva?"
+  ],
+  "duvidas_gerais": [
+    "qual o horário de funcionamento?",
+    "que horas vocês abrem e fecham?",
+    "vocês abrem na segunda-feira?",
+    "vocês funcionam hoje?",
+    "onde fica o restaurante?",
+    "qual o endereço de vocês?",
+    "a reserva tem algum custo?",
+    "precisa pagar para reservar mesa?",
+    "até que horas vocês atendem?"
+  ],
+  "fornecer_dados": [
+    "meu nome é João",
+    "pode colocar no nome de Carlos Eduardo",
+    "meu telefone é 11999998888",
+    "meu número para contato é 12988887777",
+    "para 4 pessoas",
+    "seremos em 3 pessoas",
+    "amanhã às 20h",
+    "sábado às 21:00",
+    "sim, pode confirmar",
+    "isso mesmo, está certo",
+    "pode ser na mesa 2"
+  ],
+  "saudacao": [
+    "oi",
+    "olá",
+    "tudo bem?",
+    "bom dia",
+    "boa tarde",
+    "boa noite",
+    "e aí",
+    "opa",
+    "olá, preciso de ajuda"
+  ],
+  "fora_de_escopo": [
+    "como está o tempo hoje?",
+    "vai chover amanhã?",
+    "qual a previsão do tempo para o fim de semana?",
+    "qual foi o resultado do jogo do Corinthians?",
+    "conta uma piada pra mim",
+    "qual a capital do Brasil?",
+    "quanto é dois mais dois?",
+    "me recomenda um filme",
+    "qual a cotação do dólar hoje?",
+    "quem é o presidente do Brasil?",
+    "me ajuda com meu dever de casa",
+    "como faço um bolo de chocolate?",
+    "me da um desconto ai"
+  ]
+}
