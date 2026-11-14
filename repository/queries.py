@@ -285,6 +285,16 @@ def buscar_reservas_cliente(telefone: str) -> list[dict]:
     return [r for _, r in ativas]
 
 
+def listar_todas_reservas() -> list[dict]:
+    with db.cursor() as cur:
+        cur.execute(
+            """SELECT id, mesa_id, nome_cliente, telefone, data, horario, numero_pessoas
+               FROM reservas
+               ORDER BY data DESC, horario ASC"""
+        )
+        return [dict(r) for r in cur.fetchall()]
+
+
 # --- EXCLUSÃO / CANCELAMENTO (DELETE) ---
 def cancelar_reserva(reserva_id: int, telefone: str) -> dict:
     """

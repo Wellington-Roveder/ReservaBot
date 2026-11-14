@@ -6,7 +6,7 @@ from fastembed import TextEmbedding
 
 
 class SemanticNLU:
-    def __init__(self, threshold: float = 0.65):
+    def __init__(self, threshold: float = 0.50):
         self.threshold = threshold
         # Modelo multilíngue leve (~120MB) otimizado para similaridade semântica
         self.model = TextEmbedding(
