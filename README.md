@@ -38,7 +38,7 @@ Streamlit (app.py)
 
 `services/nlu_config/nlu.py` usa `fastembed` com o modelo `paraphrase-multilingual-MiniLM-L12-v2`. Os exemplos de intenção são transformados em embeddings e normalizados por L2; a classificação compara o embedding da mensagem com esses exemplos por produto escalar, equivalente à similaridade de cosseno após a normalização.
 
-O limiar padrão do roteador é `0.50`. Na primeira mensagem, uma classificação fora do escopo gera uma resposta padrão sem consumir uma chamada à API do LLM. Em mensagens posteriores, o gatekeeper pode ser ignorado para preservar fluxos multi-turno já iniciados. A aplicação exibe a intenção, o score de confiança, o status do gatekeeper e a latência na barra lateral.
+O limiar padrão do roteador é `0.50`. Na primeira mensagem, uma classificação fora do escopo gera uma resposta padrão sem consumir uma chamada à API do LLM. Em mensagens posteriores, o gatekeeper pode ser ignorado para preservar fluxos multi-turno já iniciados. A aplicação exibe a intenção, o score de confiança, o status do gatekeeper e a latência na barra lateral. A escolha do limiar e o desempenho do roteador estão descritos em [Avaliação do roteador](#avaliação-do-roteador).
 
 ### Orquestração com tool calling
 
@@ -71,11 +71,28 @@ O prompt também contém guardrails de operação, incluindo o funcionamento de 
 - latência da solicitação;
 - reservas presentes no SQLite, com telefone mascarado para exibição.
 
+## Avaliação do roteador
+
+O roteador foi avaliado em 80 mensagens rotuladas (40 dentro e 40 fora do escopo), sem chamadas ao LLM. No limiar `0.50`:
+
+- **86,2% de acerto na decisão de escopo:** 36 de 40 mensagens fora do escopo bloqueadas e 33 de 40 mensagens válidas aprovadas;
+- **67,5% de acerto de intenção**, com desempenho fraco em pedidos indiretos (`fazer_reserva`, 1/8) e dúvidas gerais (`duvidas_gerais`, 0/6). Como o LLM escolhe as ferramentas, esse erro não interrompe o fluxo;
+- o roteador funciona como filtro de custo e telemetria. O system prompt, o tool calling restrito e as validações de `repository/queries.py` seguem como camadas seguintes.
+
+Conjunto de teste, metodologia, tabela de limiares, erros e limitações em [ADR 0001: Avaliação do roteador semântico](docs/adr/0001-avaliacao-do-roteador-semantico.md).
+
 ## Estrutura do projeto
 
 ```text
 .
 ├── app.py                         # Interface Streamlit e fluxo de atendimento
+├── benchmarks/
+│   ├── eval_nlu.py                # Avaliação do roteador semântico
+│   ├── eval.csv                   # 80 mensagens rotuladas
+│   └── resultados.txt             # Saída da última execução
+├── docs/
+│   └── adr/
+│       └── 0001-avaliacao-do-roteador-semantico.md  # Decisão e resultados da avaliação
 ├── repository/
 │   ├── database.py                # Pool simples de conexões SQLite por thread
 │   ├── queries.py                 # Schema, seed, validações e operações de reserva
@@ -112,6 +129,8 @@ Execute os testes com:
 ```bash
 pytest
 ```
+
+A avaliação do roteador é executada separadamente, conforme descrito em [Avaliação do roteador](#avaliação-do-roteador).
 
 ## Execução local
 
