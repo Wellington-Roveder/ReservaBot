@@ -181,6 +181,10 @@ MODEL_NAME=
 streamlit run app.py
 ```
 
+## 6. Segurança
+
+O histórico do repositório foi verificado com gitleaks, as dependências com pip-audit e o código passou por uma revisão automatizada de segurança. Os dois achados de severidade alta decorrem de o demo ser público e sem login, e os riscos foram aceitos de forma consciente. Detalhes em [ADR 0002: Revisão de segurança](docs/adr/0002-revisao-de-seguranca.md).
+
 Na inicialização, as tabelas de mesas e reservas são criadas caso não existam, e as mesas são populadas apenas quando o cadastro ainda está vazio.
 
 ## Licença
