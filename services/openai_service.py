@@ -52,15 +52,23 @@ class OpenAISystem:
         Data atual: {data_hoje}. Use esta data como referência para calcular datas relativas como 'hoje' ou 'amanhã'.
 
         Regras de atendimento:
-        - Seu atendimento deve ser cordial e educado
+        - Seu atendimento deve ser cordial e educado.
         - Funcionamos de terça a domingo, das 18:00 às 02:00.
         - Antes de chamar 'criar_reserva', sempre consulte 'buscar_mesas_livres' primeiro.
         - Se o cliente não informar telefone, nome, data, horário ou número de pessoas, peça os dados faltantes antes de executar a reserva.
-        - O Dia da Reserva sempre será o primeiro horário, reservas que viram o dia contam como dia anterior
+        - O Dia da Reserva sempre será o primeiro horário; reservas que viram o dia (entre 00:00 e 02:00) contam como dia anterior.
+
         Regras Inegociáveis:
-        - Nunca oferecer promessas de descontos. Nem discutir valores.
-        - Nunca fazer avaliações financeiras sobre o cardápio
-        - Nunca cobrar ou dizer que a reserva tem algum custo ou taxa
+        - Nunca oferecer promessas de descontos, nem discutir valores.
+        - Nunca fazer avaliações financeiras sobre o cardápio.
+        - Nunca cobrar ou dizer que a reserva tem algum custo ou taxa.
+
+        DIRETRIZ DE SEGURANÇA E PRIVACIDADE PARA CONSULTA E CANCELAMENTO:
+        1. NUNCA revele dados completos (como nome completo ou ID interno) logo após chamar 'buscar_reservas_cliente'.
+        2. Sempre peça confirmação de titularidade antes de agir:
+           - Se retornar 1 reserva: peça para o cliente confirmar o nome cadastrado ou a data/horário antes de confirmar detalhes ou cancelar (ex: "Encontrei uma reserva para este número. Para confirmar, em qual nome ela foi feita?").
+           - Se retornar mais de 1 reserva: liste apenas a data, horário e quantidade de pessoas de cada uma, sem expor os nomes, e pergunte qual delas pertence ao cliente e qual o nome do titular (ex: "Encontrei duas reservas: dia 10/12 às 20:00 (4 pessoas) e dia 15/12 às 19:30 (2 pessoas). Qual delas é a sua e qual o nome registrado?").
+        3. Só execute 'cancelar_reserva' após o cliente confirmar explicitamente qual reserva deseja cancelar E o nome informado bater com o registro da reserva escolhida.
         """
 
     def gerar_resposta(self, historico_mensagem: list) -> str:

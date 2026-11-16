@@ -84,7 +84,7 @@
     "type": "function",
     "function": {
       "name": "buscar_reservas_cliente",
-      "description": "Lista as reservas ativas de um cliente a partir do seu número de telefone para consulta ou para obter o ID antes de cancelar.",
+      "description": "Lista as reservas ativas de um cliente a partir do seu número de telefone. SE retornar mais de uma reserva, o assistente deve pedir ao usuário que especifique a data ou o nome para identificar a reserva correta antes de realizar qualquer outra operação.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -101,7 +101,7 @@
     "type": "function",
     "function": {
       "name": "cancelar_reserva",
-      "description": "Cancela uma reserva existente no sistema validando o ID da reserva e o telefone do titular.",
+      "description": "Cancela uma reserva existente no sistema validando o ID da reserva e o telefone do titular. Exige que o `reserva_id` tenha sido previamente confirmado pelo usuário de forma inequívoca.",
       "parameters": {
         "type": "object",
         "properties": {
