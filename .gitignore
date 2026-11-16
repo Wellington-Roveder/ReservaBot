@@ -50,3 +50,4 @@ temp/
 *.db
 *.db-wal
 *.db-shmdiagnostico_nlu.py
+*.devcontainer/
