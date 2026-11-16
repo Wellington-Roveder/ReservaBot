@@ -141,6 +141,7 @@ def criar_tabela_reservas():
                     data TEXT NOT NULL,
                     horario TEXT NOT NULL,
                     numero_pessoas INTEGER NOT NULL,
+                    criado_em TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
                     FOREIGN KEY (mesa_id) REFERENCES mesas(id) ON DELETE CASCADE)""")
 
 
@@ -286,6 +287,7 @@ def buscar_reservas_cliente(telefone: str) -> list[dict]:
 
 
 def listar_todas_reservas() -> list[dict]:
+    limpar_reservas_expiradas()
     with db.cursor() as cur:
         cur.execute(
             """SELECT id, mesa_id, nome_cliente, telefone, data, horario, numero_pessoas
@@ -315,3 +317,19 @@ def cancelar_reserva(reserva_id: int, telefone: str) -> dict:
         "status": "cancelado",
         "mensagem": f"Reserva {reserva_id} cancelada com sucesso.",
     }
+
+
+# limpeza de banco
+def limpar_reservas_expiradas() -> int:
+    """
+    Objetivo: Remover reservas criadas há mais de 24 horas,
+    garantindo retenção mínima de dados no demo público (LGPD).
+    """
+    limite_24h = (_agora() - timedelta(hours=24)).strftime("%Y-%m-%d %H:%M:%S")
+
+    with db.cursor() as cur:
+        cur.execute(
+            "DELETE FROM reservas WHERE criado_em < ?",
+            (limite_24h,),
+        )
+        return cur.rowcount
