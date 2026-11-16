@@ -108,9 +108,20 @@ def formatar_intencao(telemetria: dict) -> tuple[str, float]:
     return intencao, float(telemetria.get("confidence", 0.0))
 
 
+def mascarar_nome(nome: str) -> str:
+    """Exibe apenas o primeiro nome e a inicial do último sobrenome (ex: João S.)."""
+    if not nome or not str(nome).strip():
+        return "Visitante"
+    partes = str(nome).strip().split()
+    if len(partes) == 1:
+        return partes[0].capitalize()
+    return f"{partes[0].capitalize()} {partes[-1][0].upper()}."
+
+
 def montar_tabela_reservas(reservas: list[dict]) -> pd.DataFrame:
-    """Prepara a tabela para exibição pública: formata a data e mascara o telefone."""
+    """Prepara a tabela para exibição pública: formata a data e mascara telefone e nome."""
     df = pd.DataFrame(reservas)
+    df["nome_cliente"] = df["nome_cliente"].apply(mascarar_nome)
     df["telefone"] = "***" + df["telefone"].astype(str).str[-4:]
     datas = pd.to_datetime(df["data"], format="%Y-%m-%d", errors="coerce")
     df["data"] = datas.dt.strftime("%d/%m").fillna(df["data"])
@@ -141,6 +152,13 @@ def painel_telemetria(telemetria: dict | None) -> None:
 
     st.caption("Intenção detectada")
     st.badge(intencao, color="blue")
+
+
+def aviso_demo_publico() -> None:
+    st.warning(
+        "**Ambiente de demonstração público:** os registros ficam visíveis para outros visitantes. "
+        "Não insira dados pessoais reais. Utilize nomes fictícios e telefones de teste (ex: 11999990000)."
+    )
 
 
 def painel_reservas() -> None:
@@ -271,6 +289,7 @@ st.session_state.setdefault("ultima_telemetria", None)
 
 renderizar_sidebar()
 renderizar_cabecalho()
+aviso_demo_publico()
 acao_rapida = renderizar_acoes_rapidas()
 
 prompt = st.chat_input("Ex.: Quero reservar uma mesa para 4 pessoas amanhã às 20h")
