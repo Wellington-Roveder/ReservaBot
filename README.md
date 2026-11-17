@@ -1,5 +1,7 @@
 # ReservaBot
 
+[![CI](https://github.com/Wellington-Roveder/ReservaBot/actions/workflows/ci.yml/badge.svg)](https://github.com/Wellington-Roveder/ReservaBot/actions/workflows/ci.yml)
+
 Agente conversacional para gestão de reservas de restaurante. O sistema permite **criar, consultar e cancelar reservas** por linguagem natural, com persistência em SQLite e observabilidade em tempo real da classificação semântica e do estado do banco.
 
 [Acessar a demonstração ao vivo](https://reservas-wellingtonroveder.streamlit.app/)
