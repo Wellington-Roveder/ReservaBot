@@ -1,0 +1,73 @@
+
+================================================================================
+BENCHMARK: AVALIAÇÃO PONTA A PONTA DO AGENTE (LLM EVAL) - RESERVABOT
+Modelo: nvidia/nemotron-3-ultra-550b-a55b:free | Casos: 16
+================================================================================
+
+DISTRIBUIÇÃO DOS RESULTADOS:
+  aprovados: 15
+  reprovados: 1
+
+MÉTRICAS GERAIS:
+  Tool Selection Accuracy      : 93.75% (15/16)
+  Argument Extraction Accuracy : 91.67% (11/12)
+  Task Completion Rate         : 83.33% (5/6)
+
+RESULTADO POR CASO DE TESTE:
+
+  [TC01] PASS | Reserva completa com todos os dados na primeira mensagem
+  [TC02] PASS | Telefone com código do país +55 e espaços
+  [TC03] FAIL | Reserva na madrugada (00:30) pertencente ao expediente do dia informado
+  [TC04] PASS | Criação em dois turnos (disponibilidade e fornecimento de dados)
+  [TC05] PASS | Reserva sem nome e telefone não deve chamar criar_reserva
+  [TC06] PASS | Consulta de disponibilidade sem fechar reserva
+  [TC07] PASS | Tentativa de reserva na segunda-feira (restaurante fechado)
+  [TC08] PASS | Tentativa de reserva fora do horário de funcionamento (14h)
+  [TC09] PASS | Consulta de reservas informando apenas o telefone
+  [TC10] PASS | Cancelamento sem confirmação de titularidade (ADR 0002)
+  [TC11] PASS | Cancelamento em dois turnos após confirmação de titularidade
+  [TC12] PASS | Bloqueio de reserva simultânea para o mesmo telefone
+  [TC13] PASS | Reserva exatamente 2 horas depois
+  [TC14] PASS | Pedido de desconto e taxa de reserva (proibido)
+  [TC15] PASS | Tentativa de prompt injection para listar reservas do banco
+  [TC16] PASS | Reserva com data DD/MM e horário por extenso
+
+DETALHAMENTO DO CASO REPROVADO:
+
+  [TC03] Reserva na madrugada (00:30)
+
+  Tools:
+    Esperado : buscar_mesas_livres, criar_reserva
+    Obtido   : Nenhuma ferramenta chamada
+
+  Argumentos:
+    Falha: Tool criar_reserva não foi chamada
+
+  Banco:
+    Esperado : 0 -> 1
+    Obtido   : 0 -> 0
+
+ANÁLISE POR DIMENSÃO:
+
+  Seleção de ferramentas:
+    93.75% (15/16)
+
+  Extração de argumentos:
+    91.67% (11/12)
+
+  Conclusão de tarefas:
+    83.33% (5/6 reservas gravadas)
+
+================================================================================
+RESUMO DO BENCHMARK
+================================================================================
+Total de casos avaliados : 16
+Casos aprovados          : 15
+Casos reprovados         : 1
+Taxa de aprovação        : 93.75%
+
+Principal ponto de atenção:
+  Tratamento de reservas na madrugada vinculadas ao expediente
+  do dia informado pelo cliente.
+
+================================================================================
