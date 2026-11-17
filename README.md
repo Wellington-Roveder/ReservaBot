@@ -83,39 +83,61 @@ O roteador foi avaliado em 80 mensagens rotuladas (40 dentro e 40 fora do escopo
 
 Conjunto de teste, metodologia, tabela de limiares, erros e limitações em [ADR 0001: Avaliação do roteador semântico](docs/adr/0001-avaliacao-do-roteador-semantico.md).
 
+## Avaliação do agente
+
+O agente foi avaliado ponta a ponta em 16 cenários, com chamadas reais ao LLM (`nvidia/nemotron-3-ultra-550b-a55b:free`), SQLite em memória e relógio congelado. Resultados:
+
+- **93,75% de acerto na seleção de ferramentas** (15 de 16 casos);
+- **91,67% de acerto na extração de argumentos** (11 de 12 casos);
+- **83,33% de conclusão de tarefas** (5 de 6 reservas gravadas);
+- os guardrails bloquearam *prompt injection*, pedidos de desconto, expediente fechado e cancelamento sem confirmação de titularidade. A única falha foi a reserva às 00:30 (TC03), em que o agente não chamou nenhuma ferramenta por ambiguidade na regra de madrugada do *system prompt*.
+
+Por usar a API real, a suíte roda sob demanda, antes de releases ou trocas de modelo, e não a cada commit:
+
+```bash
+python -m benchmarks.eval_agent
+```
+
+Cenários, métricas e análise das falhas em [ADR 0003: Avaliação ponta a ponta do agente](docs/adr/0003-avaliacao-ponta-a-ponta-agente.md).
+
 ## Estrutura do projeto
 
 ```text
 .
-├── app.py                         # Interface Streamlit e fluxo de atendimento
+├── app.py                                           # Interface Streamlit e fluxo de atendimento
 ├── benchmarks/
-│   ├── eval_nlu.py                # Avaliação do roteador semântico
-│   ├── eval.csv                   # 80 mensagens rotuladas
-│   └── resultados.txt             # Saída da última execução
+│   ├── eval_nlu.py                                  # Avaliação do roteador semântico
+│   ├── eval.csv                                     # 80 mensagens rotuladas
+│   ├── resultados.txt                               # Saída da última execução do roteador
+│   ├── eval_agent.py                                # Avaliação ponta a ponta do agente
+│   ├── eval_agent_cases.json                        # 16 cenários de teste do agente
+│   └── resultados_eval_agent.txt                    # Saída da última execução do agente
 ├── docs/
 │   └── adr/
-│       └── 0001-avaliacao-do-roteador-semantico.md  # Decisão e resultados da avaliação
+│       ├── 0001-avaliacao-do-roteador-semantico.md  # Decisão e resultados da avaliação do roteador
+│       ├── 0002-revisao-de-seguranca.md             # Revisão de segurança e riscos aceitos
+│       └── 0003-avaliacao-ponta-a-ponta-agente.md   # Decisão e resultados da avaliação do agente
 ├── repository/
-│   ├── database.py                # Pool simples de conexões SQLite por thread
-│   ├── queries.py                 # Schema, seed, validações e operações de reserva
+│   ├── database.py                                  # Pool simples de conexões SQLite por thread
+│   ├── queries.py                                   # Schema, seed, validações e operações de reserva
 │   └── __init__.py
 ├── services/
-│   ├── openai_service.py          # Cliente compatível com OpenAI e loop de tools
-│   ├── tools.json                 # Contratos das funções disponíveis ao modelo
+│   ├── openai_service.py                            # Cliente compatível com OpenAI e loop de tools
+│   ├── tools.json                                   # Contratos das funções disponíveis ao modelo
 │   ├── nlu_config/
-│   │   ├── nlu.py                 # Classificador semântico local
-│   │   └── intents.json            # Exemplos de intenções
+│   │   ├── nlu.py                                   # Classificador semântico local
+│   │   └── intents.json                             # Exemplos de intenções
 │   └── __init__.py
 ├── tests/
-│   ├── conftest.py                # Fixtures dos testes
-│   ├── test_nlu.py                # Testes do roteador semântico
-│   ├── test_openai_service.py     # Testes do loop e das falhas de tools
-│   └── test_queries.py             # Testes das regras e queries SQLite
+│   ├── conftest.py                                  # Fixtures dos testes
+│   ├── test_nlu.py                                  # Testes do roteador semântico
+│   ├── test_openai_service.py                       # Testes do loop e das falhas de tools
+│   └── test_queries.py                              # Testes das regras e queries SQLite
 ├── assets/
-│   └── icone.png                  # Ícone usado pela interface
-├── .env.example                   # Exemplo de configuração local
-├── requirements.txt               # Dependências Python
-└── LICENSE                        # Licença MIT
+│   └── icone.png                                    # Ícone usado pela interface
+├── .env.example                                     # Exemplo de configuração local
+├── requirements.txt                                 # Dependências Python
+└── LICENSE                                          # Licença MIT
 ```
 
 ## Qualidade e testes
@@ -131,8 +153,7 @@ Execute os testes com:
 ```bash
 pytest
 ```
-
-A avaliação do roteador é executada separadamente, conforme descrito em [Avaliação do roteador](#avaliação-do-roteador).
+As avaliações do roteador e do agente são executadas separadamente, conforme descrito em [Avaliação do roteador](#avaliação-do-roteador) e [Avaliação do agente](#avaliação-do-agente).
 
 ## Execução local
 
@@ -183,11 +204,11 @@ MODEL_NAME=
 streamlit run app.py
 ```
 
-## 6. Segurança
+Na inicialização, as tabelas de mesas e reservas são criadas caso não existam, e as mesas são populadas apenas quando o cadastro ainda está vazio.
+
+## Segurança
 
 O histórico do repositório foi verificado com gitleaks, as dependências com pip-audit e o código passou por uma revisão automatizada de segurança. Os dois achados de severidade alta decorrem de o demo ser público e sem login, e os riscos foram aceitos de forma consciente. Detalhes em [ADR 0002: Revisão de segurança](docs/adr/0002-revisao-de-seguranca.md).
-
-Na inicialização, as tabelas de mesas e reservas são criadas caso não existam, e as mesas são populadas apenas quando o cadastro ainda está vazio.
 
 ## Licença
 
