@@ -1,0 +1,45 @@
+mensagem,esperado
+Quero reservar uma mesa para 4 pessoas amanhã às 20h,fazer_reserva
+Ta confirmada minha reserva pra hj?,consultar_reserva
+Verifica se tem algum agendamento no meu cadastro,consultar_reserva
+Vocês funcionam na quarta-feira?,horario_funcionamento
+Até quando vocês atendem na madrugada?,horario_funcionamento
+Vocês aceitam pet na área externa?,fora_de_escopo
+Preciso marcar uma mesa para 4 pessoas na próxima terça,fazer_reserva
+Vocês servem drinks sem álcool?,fora_de_escopo
+Preciso desmarcar o jantar reservado,cancelar_reserva
+Cancela a mesa que reservei para o aniversário,cancelar_reserva
+O restaurante abre ao meio-dia?,horario_funcionamento
+Qual o sentido da vida?,fora_de_escopo
+Tem promoção de happy hour?,fora_de_escopo
+Bota uma mesa pra 4 aí pra amanhã umas 8 da noite,fazer_reserva
+Dá pra reservar mesa pra hoje ainda?,fazer_reserva
+Vocês servem café da manhã?,fora_de_escopo
+Qual horário ficou agendado para mim?,consultar_reserva
+"Bom dia, tudo bem com você?",fora_de_escopo
+Vocês têm acessibilidade para cadeirante?,fora_de_escopo
+Quero reservar um carro na locadora,fora_de_escopo
+Vocês abrem às 18h todos os dias?,horario_funcionamento
+Anula minha reserva de hoje,cancelar_reserva
+qro reserva mesa hj pra 2,fazer_reserva
+Pode fazer uma reserva para mim amanhã às 19h?,fazer_reserva
+Desmarcar reserva de hoje,cancelar_reserva
+Tem como agendar para 2 pessoas hoje às 21h?,fazer_reserva
+Busca as reservas vinculadas ao meu telefone,consultar_reserva
+Quero elogiar o chef de cozinha,fora_de_escopo
+Pode checar minha reserva para hoje?,consultar_reserva
+Qual o sabor da pizza mais pedida?,fora_de_escopo
+Vocês cobram 10% de serviço?,fora_de_escopo
+Quero reservar um lugar para 2 pessoas amanhã,fazer_reserva
+Quero saber se ainda tenho reserva ativa aí,consultar_reserva
+Qual a previsão do tempo para hoje?,fora_de_escopo
+Que horas vocês abrem hoje?,horario_funcionamento
+Quero reservar um quarto de hotel para o fim de semana,fora_de_escopo
+Pode cancelar apenas uma das minhas reservas?,cancelar_reserva
+Qual o horário de abertura e fechamento?,horario_funcionamento
+"Não vou conseguir comparecer, cancela a reserva",cancelar_reserva
+Pode confirmar se o agendamento deu certo?,consultar_reserva
+Tem música ao vivo sexta à noite?,fora_de_escopo
+Quando vocês abrem?,horario_funcionamento
+Infelizmente vou precisar cancelar a mesa de sexta,cancelar_reserva
+Quem ganhou o jogo ontem?,fora_de_escopo
