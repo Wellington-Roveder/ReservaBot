@@ -156,4 +156,4 @@ class TestSystemPrompt:
         ia, _ = montar([("text", "x")])
         prompt = ia._montar_system_prompt()
         assert "terça a domingo" in prompt
-        assert "dia anterior" in prompt
+        assert "00:00 e 01:59" in prompt

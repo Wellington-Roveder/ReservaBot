@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Wellington-Roveder/ReservaBot/actions/workflows/ci.yml/badge.svg)](https://github.com/Wellington-Roveder/ReservaBot/actions/workflows/ci.yml)
 
-Agente conversacional para gestão de reservas de restaurante. O sistema permite **criar, consultar e cancelar reservas** por linguagem natural, com persistência em SQLite e observabilidade em tempo real da classificação semântica e do estado do banco.
+Agente conversacional para gestão de reservas de restaurante. O sistema permite **criar, consultar e cancelar reservas** por linguagem natural, com persistência em SQLite e observabilidade em tempo real da classificação semântica, das chamadas ao LLM, do custo estimado e do estado do banco.
 
 [Acessar a demonstração ao vivo](https://reservas-wellingtonroveder.streamlit.app/)
 
@@ -23,17 +23,22 @@ Streamlit (app.py)
   │    ├─ Similaridade de cosseno com normalização L2
   │    └─ Gatekeeper de escopo e telemetria de intenção/confiança
   │
-  └─ OpenAISystem
-       ├─ System prompt com data e dia da semana atuais
-       ├─ Guardrails de atendimento e regras de negócio
-       ├─ Tool calling carregado de services/tools.json
-       └─ Loop iterativo limitado para encadear ferramentas
-              │
-              ▼
-       repository/queries.py
-              │
-              ▼
-       SQLite (ReservasMesa.db)
+  ├─ OpenAISystem
+  │    ├─ System prompt com data e dia da semana atuais
+  │    ├─ Guardrails de atendimento e regras de negócio
+  │    ├─ Tool calling carregado de services/tools.json
+  │    ├─ Loop iterativo limitado para encadear ferramentas
+  │    └─ Trace por turno (iterações, tokens e duração das ferramentas)
+  │           │
+  │           ▼
+  │    repository/queries.py
+  │           │
+  │           ▼
+  │    SQLite (ReservasMesa.db)
+  │
+  └─ Telemetry (services/telemetry.py)
+       ├─ Custo estimado por tokens de entrada e saída
+       └─ Logs estruturados em logs/traces.jsonl
 ```
 
 ### Gatekeeper semântico
@@ -49,6 +54,8 @@ O limiar padrão do roteador é `0.50`. Na primeira mensagem, uma classificaçã
 As ferramentas descritas em `services/tools.json` cobrem listagem de mesas, busca de disponibilidade, criação, consulta e cancelamento de reservas. O serviço executa um loop `while` com limite de cinco iterações: cada resposta do modelo pode solicitar uma ou mais ferramentas, cujos resultados são devolvidos ao modelo até que uma resposta textual seja produzida ou o limite seja atingido.
 
 O prompt também contém guardrails de operação, incluindo o funcionamento de terça a domingo, das 18:00 às 02:00, a consulta de mesas livres antes da criação de uma reserva e a solicitação de dados obrigatórios antes da execução.
+
+A cada turno, o serviço acumula os tokens de todas as iterações e cronometra cada ferramenta, expondo o resultado em `ultimo_trace`. A seção [Observabilidade](#observabilidade) descreve como esses dados são exibidos e registrados.
 
 ### Dados e regras de negócio
 
@@ -71,7 +78,11 @@ O prompt também contém guardrails de operação, incluindo o funcionamento de 
 - intenção detectada e score de confiança;
 - indicação de passagem, bloqueio ou bypass do gatekeeper;
 - latência da solicitação;
+- `trace_id`, número de iterações do loop, tokens consumidos e custo estimado em USD;
+- status e tempo de cada ferramenta executada;
 - reservas presentes no SQLite, com telefone mascarado para exibição.
+
+Cada turno também grava uma linha JSON em `logs/traces.jsonl`, com metadados operacionais e sem texto livre nem dados pessoais. O custo é calculado em `services/telemetry.py`, com sobrescrita por `PRICE_INPUT_PER_M` e `PRICE_OUTPUT_PER_M` no `.env` e tarifa zero para modelos `:free`. Decisão, resultados e limitações em [ADR 0004: Tracing estruturado e observabilidade](docs/adr/0004-tracing-estruturado-e-observabilidade.md).
 
 ## Avaliação do roteador
 
@@ -104,40 +115,43 @@ Cenários, métricas e análise das falhas em [ADR 0003: Avaliação ponta a pon
 
 ```text
 .
-├── app.py                                           # Interface Streamlit e fluxo de atendimento
+├── app.py                              # Interface Streamlit e fluxo de atendimento
 ├── benchmarks/
-│   ├── eval_nlu.py                                  # Avaliação do roteador semântico
-│   ├── eval.csv                                     # 80 mensagens rotuladas
-│   ├── resultados.txt                               # Saída da última execução do roteador
-│   ├── eval_agent.py                                # Avaliação ponta a ponta do agente
-│   ├── eval_agent_cases.json                        # 16 cenários de teste do agente
-│   └── resultados_eval_agent.txt                    # Saída da última execução do agente
+│   ├── eval_nlu.py                     # Avaliação do roteador semântico
+│   ├── eval.csv                        # 80 mensagens rotuladas
+│   ├── resultados.txt                  # Saída da avaliação do roteador
+│   ├── eval_agent.py                   # Avaliação ponta a ponta do agente (LLM Eval)
+│   ├── eval_agent_cases.json           # 16 cenários estruturados de teste do agente
+│   └── resultados_eval_agent.txt       # Saída da avaliação do agente
 ├── docs/
 │   └── adr/
-│       ├── 0001-avaliacao-do-roteador-semantico.md  # Decisão e resultados da avaliação do roteador
-│       ├── 0002-revisao-de-seguranca.md             # Revisão de segurança e riscos aceitos
-│       └── 0003-avaliacao-ponta-a-ponta-agente.md   # Decisão e resultados da avaliação do agente
+│       ├── 0001-avaliacao-do-roteador-semantico.md
+│       ├── 0002-revisao-de-seguranca.md
+│       ├── 0003-avaliacao-ponta-a-ponta-agente.md
+│       └── 0004-tracing-estruturado-e-observabilidade.md
 ├── repository/
-│   ├── database.py                                  # Pool simples de conexões SQLite por thread
-│   ├── queries.py                                   # Schema, seed, validações e operações de reserva
+│   ├── database.py                     # Pool simples de conexões SQLite por thread
+│   ├── queries.py                      # Schema, seed, validações e operações de reserva
 │   └── __init__.py
 ├── services/
-│   ├── openai_service.py                            # Cliente compatível com OpenAI e loop de tools
-│   ├── tools.json                                   # Contratos das funções disponíveis ao modelo
+│   ├── openai_service.py               # Cliente compatível com OpenAI e loop de tools
+│   ├── telemetry.py                    # Cálculo de custo e logs estruturados (JSONL)
+│   ├── tools.json                      # Contratos das funções disponíveis ao modelo
 │   ├── nlu_config/
-│   │   ├── nlu.py                                   # Classificador semântico local
-│   │   └── intents.json                             # Exemplos de intenções
+│   │   ├── nlu.py                      # Classificador semântico local
+│   │   └── intents.json                # Exemplos de intenções
 │   └── __init__.py
 ├── tests/
-│   ├── conftest.py                                  # Fixtures dos testes
-│   ├── test_nlu.py                                  # Testes do roteador semântico
-│   ├── test_openai_service.py                       # Testes do loop e das falhas de tools
-│   └── test_queries.py                              # Testes das regras e queries SQLite
+│   ├── conftest.py                     # Fixtures dos testes
+│   ├── test_nlu.py                     # Testes do roteador semântico
+│   ├── test_openai_service.py          # Testes do loop e das falhas de tools
+│   ├── test_queries.py                 # Testes das regras e queries SQLite
+│   └── test_telemetry.py               # Testes de precificação e logs JSONL
 ├── assets/
-│   └── icone.png                                    # Ícone usado pela interface
-├── .env.example                                     # Exemplo de configuração local
-├── requirements.txt                                 # Dependências Python
-└── LICENSE                                          # Licença MIT
+│   └── icone.png                       # Ícone usado pela interface
+├── .env.example                        # Exemplo de configuração local
+├── requirements.txt                    # Dependências Python
+└── LICENSE                             # Licença MIT
 ```
 
 ## Qualidade e testes
@@ -146,13 +160,15 @@ A suíte automatizada usa `pytest` e cobre:
 
 - classificação de intenções, limiar e mensagens fora do escopo;
 - orquestração do serviço de IA, encadeamento de ferramentas e tratamento de erros;
-- queries SQLite, validações de horários, madrugada, capacidade, telefones, conflitos e cancelamentos.
+- queries SQLite, validações de horários, madrugada, capacidade, telefones, conflitos e cancelamentos;
+- precificação de tokens, tratamento de variáveis vazias no `.env` e escrita JSONL sem duplicação de handlers.
 
 Execute os testes com:
 
 ```bash
 pytest
 ```
+
 As avaliações do roteador e do agente são executadas separadamente, conforme descrito em [Avaliação do roteador](#avaliação-do-roteador) e [Avaliação do agente](#avaliação-do-agente).
 
 ## Execução local
@@ -197,6 +213,8 @@ MODEL_NAME=
 ```
 
 `DATABASE_NAME` também pode ser configurado para definir o arquivo SQLite; o exemplo usa `ReservasMesa.db`.
+
+`PRICE_INPUT_PER_M` e `PRICE_OUTPUT_PER_M` são opcionais e sobrescrevem a tarifa de referência usada na estimativa de custo.
 
 ### 5. Executar a aplicação
 
