@@ -45,9 +45,11 @@ logs/
 *.db
 tmp/
 temp/
-
 *.db-shm
 *.db
 *.db-wal
 *.db-shmdiagnostico_nlu.py
 *.devcontainer/
+
+#benchmarks/artifacts
+benchmarks/nlu_experiment/artifacts/

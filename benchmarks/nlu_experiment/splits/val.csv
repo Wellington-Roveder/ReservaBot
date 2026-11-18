@@ -1,0 +1,44 @@
+mensagem,esperado
+Quero remover o agendamento da minha mesa,cancelar_reserva
+Quero verificar meu agendamento de mesa,consultar_reserva
+Que horas fecha a cozinha?,horario_funcionamento
+Qual hora vocês encerram o atendimento?,horario_funcionamento
+Vocês vendem vale-presente?,fora_de_escopo
+Cancela a reserva de sexta-feira por favor,cancelar_reserva
+Gostaria de saber se tenho reserva pendente,consultar_reserva
+Qual o horário de funcionamento de sexta a domingo?,horario_funcionamento
+Preciso de uma mesa para 4 pessoas quarta que vem,fazer_reserva
+Preciso cancelar com antecedência a mesa de amanhã,cancelar_reserva
+Você é um robô ou uma pessoa?,fora_de_escopo
+Qual o prato do dia hoje?,fora_de_escopo
+Qual a senha do Wi-Fi do restaurante?,fora_de_escopo
+Abrem todos os dias da semana?,horario_funcionamento
+Me manda o cardápio em PDF,fora_de_escopo
+Atendem a partir de que horas?,horario_funcionamento
+Vocês cobram taxa de rolha?,fora_de_escopo
+Quero ver se minha reserva está confirmada,consultar_reserva
+Apaga minha reserva de amanhã por favor,cancelar_reserva
+Me ajuda a resolver uma equação de segundo grau,fora_de_escopo
+Tem mesa livre pra 4 pessoas agora?,fazer_reserva
+Pode liberar a mesa que eu tinha reservado para domingo?,cancelar_reserva
+Qual a capital da França?,fora_de_escopo
+Tem como reservar uma mesa para 7 pessoas amanhã?,fazer_reserva
+Preciso de uma mesa para 5 pessoas nesta quinta,fazer_reserva
+Quero consultar a reserva feita no telefone 11999998888,consultar_reserva
+Vocês parcelam no cartão de crédito?,fora_de_escopo
+Qual mesa ficou reservada pra mim?,consultar_reserva
+Minhas reservas ativas por favor,consultar_reserva
+Não entendi o que você disse,fora_de_escopo
+Domingo fecha mais cedo?,horario_funcionamento
+Vê aí se tem reserva no meu nome pra sábado,consultar_reserva
+Cancela a reserva vinculada ao telefone 11977776666,cancelar_reserva
+O restaurante funciona durante a tarde?,horario_funcionamento
+Quero desistir da reserva que fiz mais cedo,cancelar_reserva
+Consegue encaixar 10 pessoas na sexta às 20h?,fazer_reserva
+Quanto custa o estacionamento conveniado?,fora_de_escopo
+Quanto fica a conta para 4 pessoas em média?,fora_de_escopo
+Quero falar com um atendente humano,fora_de_escopo
+Qual o valor do rodízio?,fora_de_escopo
+Queria agendar uma mesa pra 2 no sábado à 01h da manhã,fazer_reserva
+Quero agendar um jantar para 6 pessoas no domingo,fazer_reserva
+Gostaria de agendar uma mesa para aniversário na sexta,fazer_reserva

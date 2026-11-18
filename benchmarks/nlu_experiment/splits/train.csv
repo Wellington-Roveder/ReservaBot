@@ -1,0 +1,203 @@
+mensagem,esperado
+Quero fazer uma reserva rápida para hoje,fazer_reserva
+Quero marcar jantar para 4 pessoas nesta sexta,fazer_reserva
+Quero fazer agendamento de mesa para hoje às 18h,fazer_reserva
+Tem sobremesa sem glúten?,fora_de_escopo
+Vocês fazem buffet para casamento?,fora_de_escopo
+Quais são os pratos da casa?,fora_de_escopo
+Me ajuda a traduzir esse texto para inglês,fora_de_escopo
+Tem Wi-Fi gratuito para clientes?,fora_de_escopo
+Vocês têm disponibilidade para 3 pessoas hoje às 20h30?,fazer_reserva
+Cancela o jantar de hoje no meu nome,cancelar_reserva
+Pode tirar minha reserva de sábado?,cancelar_reserva
+Me informa o horário de funcionamento por favor,horario_funcionamento
+Quero pedir uma coca-cola e uma porção de batata,fora_de_escopo
+Gostaria de reservar uma mesa para 2 hoje às 22h30,fazer_reserva
+Para quantas pessoas eu fiz a reserva de amanhã?,consultar_reserva
+Vocês têm cadeirão para bebê?,fora_de_escopo
+Aceitam vale-refeição Alelo e Sodexo?,fora_de_escopo
+"Não vou poder ir amanhã, pode cancelar minha reserva?",cancelar_reserva
+Confirma o horário do meu jantar reservado,consultar_reserva
+Vocês fazem eventos corporativos fechados?,fora_de_escopo
+Qual o horário do banco mais próximo?,fora_de_escopo
+Vocês têm estacionamento próprio?,fora_de_escopo
+Me indica um filme bom na Netflix,fora_de_escopo
+Onde envio meu currículo para trabalhar aí?,fora_de_escopo
+Tem mesa disponível às 00:30 de domingo?,fazer_reserva
+Quero olhar os dados da reserva no meu número,consultar_reserva
+Tem música ao vivo hoje?,fora_de_escopo
+Preciso cancelar minha passagem de ônibus,fora_de_escopo
+Quero reservar uma passagem aérea para o Rio,fora_de_escopo
+Abrem terça-feira às 18h?,horario_funcionamento
+Quais são os dias e horários de abertura?,horario_funcionamento
+Posso levar meu próprio bolo de aniversário?,fora_de_escopo
+Tem vaga pra 3 pessoas amanhã no primeiro horário?,fazer_reserva
+Sábado vocês ficam abertos até que horas?,horario_funcionamento
+Estou ligando para cancelar a reserva da mesa,cancelar_reserva
+Remove minha reserva de quinta-feira por gentileza,cancelar_reserva
+Faz uma reserva no nome de Carlos para amanhã às 19h,fazer_reserva
+Quero marcar mesa pra hoje à noite,fazer_reserva
+Quanto custa uma garrafa de vinho?,fora_de_escopo
+Quero ver minhas reservas futuras,consultar_reserva
+Vocês ficam abertos até 02:00?,horario_funcionamento
+Gostaria de garantir lugar para 3 pessoas amanhã à noite,fazer_reserva
+Preciso de reserva para jantar de negócios quinta às 19h,fazer_reserva
+Qual o horário normal da casa?,horario_funcionamento
+Confere se a reserva de 4 pessoas está confirmada,consultar_reserva
+Separa uma mesa pra 3 pessoas amanhã às 20h,fazer_reserva
+Cancela aí a reserva que fiz no meu celular,cancelar_reserva
+Tive um imprevisto e preciso cancelar o agendamento,cancelar_reserva
+Quero fazer uma reclamação sobre o atendimento de ontem,fora_de_escopo
+"Não vai dar pra ir hoje à noite, cancela por favor",cancelar_reserva
+Marca uma mesa pra 2 sexta que vem às 22h,fazer_reserva
+O restaurante abre domingo à noite?,horario_funcionamento
+Quanto custa a taxa de entrega para o meu bairro?,fora_de_escopo
+Vocês vendem ingredientes separados?,fora_de_escopo
+Até que horas o restaurante fica aberto?,horario_funcionamento
+Pode ver minhas reservas por gentileza?,consultar_reserva
+Vocês aceitam Pix?,fora_de_escopo
+"Não vamos mais jantar aí hoje, pode desmarcar",cancelar_reserva
+"Valeu, obrigado pela ajuda!",fora_de_escopo
+Tem lugar pra 8 pessoas sábado agora?,fazer_reserva
+Queria deixar reservado para 6 pessoas na quarta às 20h,fazer_reserva
+Vocês fecham à meia-noite ou mais tarde?,horario_funcionamento
+Me diz os horários de atendimento da semana,horario_funcionamento
+Quero marcar uma reserva para meia-noite e meia de sábado,fazer_reserva
+"Oi, queria marcar um horário pra ir jantar aí amanhã",fazer_reserva
+Me ajuda a conferir minha reserva de hoje à noite,consultar_reserva
+Tem alguma mesa no meu nome hoje?,consultar_reserva
+Pode buscar minhas reservas cadastradas?,consultar_reserva
+Vocês vendem mesa de jantar de 6 cadeiras?,fora_de_escopo
+Quais dias o restaurante fica fechado?,horario_funcionamento
+Quero cancelar minha mesa para o dia 20,cancelar_reserva
+Quero pedir uma reserva de mesa para domingo às 18h30,fazer_reserva
+Checa pra mim que horas eu marquei hoje,consultar_reserva
+Consegue uma mesa para 5 pessoas hoje às 19h30?,fazer_reserva
+Qual o preço médio por pessoa?,fora_de_escopo
+Tem rodízio de massas na quarta?,fora_de_escopo
+Quero reservar uma mesa para 4 adultos e 1 criança no domingo,fazer_reserva
+Reserva uma mesa pra mim no sábado às 19h30,fazer_reserva
+Qual o expediente do restaurante nos fins de semana?,horario_funcionamento
+Me informa se minha mesa já está reservada para sexta,consultar_reserva
+Quanto custa o couvert artístico?,fora_de_escopo
+Quero reservar para 2 pessoas às 23h de hoje,fazer_reserva
+"Tchau, até mais",fora_de_escopo
+Até que hora dá pra entrar no restaurante?,horario_funcionamento
+Eu tenho mesa reservada para este fim de semana?,consultar_reserva
+Agende uma mesa para 4 pessoas às 21h de sexta,fazer_reserva
+Vocês funcionam até as 2 da manhã mesmo?,horario_funcionamento
+Qual o horário de atendimento de vocês?,horario_funcionamento
+O funcionamento é só noturno?,horario_funcionamento
+Escreve um código em Python para mim,fora_de_escopo
+Gostaria de conferir os detalhes da minha reserva,consultar_reserva
+Até que horário posso chegar para jantar?,horario_funcionamento
+Quanto custa o prato executivo?,fora_de_escopo
+Quero garantir uma mesa para o jantar de amanhã,fazer_reserva
+Tem mesa livre para 2 pessoas sexta-feira às 21h?,fazer_reserva
+Gostaria de desfazer minha reserva para domingo,cancelar_reserva
+Quero reservar mesa para comemorar aniversário sábado,fazer_reserva
+Tem mesa para 8 pessoas no domingo às 19h?,fazer_reserva
+Quero cancelar a reserva das 20h30,cancelar_reserva
+Tira meu nome da lista de reservas de hoje,cancelar_reserva
+Quanto custa alugar o espaço para festa?,fora_de_escopo
+Confirma pra mim se está tudo certo com a minha mesa,consultar_reserva
+Não preciso mais da mesa para 4 pessoas amanhã,cancelar_reserva
+Pode localizar minha reserva de domingo?,consultar_reserva
+Olha no sistema se minha reserva entrou,consultar_reserva
+Qual é a data da minha próxima reserva?,consultar_reserva
+Preciso anular minha reserva de mesa,cancelar_reserva
+Consulta aí pelo meu celular se tem mesa marcada,consultar_reserva
+"Deu ruim aqui e não vamos conseguir ir, tira minha reserva",cancelar_reserva
+Qual o horário do próximo ônibus para o centro?,fora_de_escopo
+Tem desconto para aniversariante?,fora_de_escopo
+Me passa os detalhes da reserva que fiz para amanhã,consultar_reserva
+Onde fica o banheiro?,fora_de_escopo
+Desmarca o agendamento que está no meu número,cancelar_reserva
+Verifica pra mim se está tudo ok com minha reserva,consultar_reserva
+Vocês abrem feriado?,horario_funcionamento
+Vê se já aparece minha reserva pra sexta-feira,consultar_reserva
+Vocês aceitam cheque?,fora_de_escopo
+Quero cancelar meu pedido de entrega,fora_de_escopo
+"Não lembro se marquei às 20h ou 21h, pode olhar?",consultar_reserva
+Quero excluir minha reserva do sistema,cancelar_reserva
+O restaurante funciona de terça a domingo?,horario_funcionamento
+Quero saber o preço do filé mignon,fora_de_escopo
+O ambiente tem ar-condicionado?,fora_de_escopo
+Vocês aceitam reserva para hoje às 19h?,fazer_reserva
+Não vamos mais precisar da mesa reservada,cancelar_reserva
+Tem espaço kids com monitor?,fora_de_escopo
+Tem opção de menu infantil?,fora_de_escopo
+Preciso da segunda via da nota fiscal,fora_de_escopo
+Rola reservar uma mesa pra 4 agora às 21h?,fazer_reserva
+Pode desmarcar minha ida de amanhã?,cancelar_reserva
+Vocês têm manobrista na porta?,fora_de_escopo
+Que horas abre o restaurante na sexta?,horario_funcionamento
+Quero agendar corte de cabelo para sábado,fora_de_escopo
+Vocês têm carta de cervejas importadas?,fora_de_escopo
+Já consta minha reserva no sistema?,consultar_reserva
+Qual dia vocês folgam?,horario_funcionamento
+Preciso desmarcar a mesa que reservei para hoje,cancelar_reserva
+Quero dar baixa na minha reserva,cancelar_reserva
+Qual é o horário de expediente?,horario_funcionamento
+Agendar mesa 4 lugares terça 18h30,fazer_reserva
+Qual a voltagem das tomadas aí?,fora_de_escopo
+Vocês fazem entrega pelo iFood?,fora_de_escopo
+Pode separar uma mesa para 5 pessoas sábado às 20h30?,fazer_reserva
+Qual horário posso ir jantar aí?,horario_funcionamento
+Que horas vocês fecham as portas?,horario_funcionamento
+Cancelar reserva urgente,cancelar_reserva
+Consultar minhas reservas,consultar_reserva
+Vocês têm opções veganas no menu?,fora_de_escopo
+Vocês estão funcionando agora?,horario_funcionamento
+Tira a reserva de 2 pessoas de sexta-feira,cancelar_reserva
+Quero cancelar minha assinatura da academia,fora_de_escopo
+Buscar reserva pelo telefone,consultar_reserva
+Desfaz a reserva que eu fiz para amanhã às 20h,cancelar_reserva
+"Eu fiz uma reserva ontem, queria confirmar os dados",consultar_reserva
+Tenho alguma reserva marcada no meu número?,consultar_reserva
+Desmarca aí pra mim que mudou os planos,cancelar_reserva
+Meu pedido atrasou no aplicativo,fora_de_escopo
+Vocês atendem de madrugada?,horario_funcionamento
+Gostaria de revisar minha reserva da semana que vem,consultar_reserva
+"Oi, precisa de alguma coisa?",fora_de_escopo
+Desmarca minha mesa de sábado à noite,cancelar_reserva
+Preciso reservar uma mesa tranquila para casal hoje,fazer_reserva
+Pode cancelar a reserva feita ontem?,cancelar_reserva
+Que horas abre hoje à noite?,horario_funcionamento
+Preciso agendar uma consulta médica para amanhã,fora_de_escopo
+Quero encerrar minha reserva ativa,cancelar_reserva
+Quero cancelar o agendamento de 6 pessoas,cancelar_reserva
+Quero checar a reserva que marquei para 6 pessoas,consultar_reserva
+Tem opção sem lactose no cardápio?,fora_de_escopo
+Queria checar o status da minha reserva,consultar_reserva
+Tem chope artesanal na torneira?,fora_de_escopo
+Libera minha reserva de hoje às 21h,cancelar_reserva
+Quero fazer um pedido para delivery,fora_de_escopo
+Meu cupom de desconto não está funcionando,fora_de_escopo
+Que horas começa o atendimento à noite?,horario_funcionamento
+Quais dias da semana vocês funcionam?,horario_funcionamento
+Abrem no almoço ou só no jantar?,horario_funcionamento
+Vocês entregam na zona sul?,fora_de_escopo
+Qual o preço da picanha na chapa?,fora_de_escopo
+Esqueci meu casaco aí no restaurante ontem,fora_de_escopo
+Que horas encerra o turno da noite?,horario_funcionamento
+Qual a capacidade máxima do salão?,fora_de_escopo
+"Esqueci o dia que eu reservei, pode verificar?",consultar_reserva
+Gostaria de cancelar meu horário marcado,cancelar_reserva
+Qual o CNPJ do restaurante?,fora_de_escopo
+Gostaria de consultar meu histórico de reservas ativas,consultar_reserva
+Gostaria de fazer uma reserva para hoje à noite,fazer_reserva
+Vocês têm sala privativa para reunião?,fora_de_escopo
+Como faço para chegar aí de metrô?,fora_de_escopo
+Hoje vocês estão abertos?,horario_funcionamento
+Qual o telefone da gerência?,fora_de_escopo
+Verifique minhas reservas atuais,consultar_reserva
+Me passa o horário que vocês abrem e fecham,horario_funcionamento
+Reserva pra mim e minha esposa hoje às 21h30,fazer_reserva
+Vocês estão contratando garçom?,fora_de_escopo
+Qual o tempo médio de espera na fila?,fora_de_escopo
+Me passa o Instagram do restaurante,fora_de_escopo
+Tem disponibilidade de mesa para 6 no sábado?,fazer_reserva
+Vocês trabalham com marmitex?,fora_de_escopo
+Reserva uma mesa pro meu grupo de 6 pessoas na sexta,fazer_reserva
+Vocês têm área para fumantes?,fora_de_escopo

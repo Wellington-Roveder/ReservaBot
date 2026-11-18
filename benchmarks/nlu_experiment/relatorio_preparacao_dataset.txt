@@ -1,0 +1,16 @@
+=== RELATÓRIO DE PREPARAÇÃO DO DATASET ===
+Total bruto:                        305
+Removidos (duplicatas exatas):      0
+Removidos (leakage intents.json):   11
+Removidos (near-duplicates >=0.92): 5
+Total limpo final:                  289
+--------------------------------------------
+Treino (70%): 202 | Validação (15%): 43 | Teste (15%): 44
+
+Distribuição por classe no dataset final:
+esperado
+fora_de_escopo           97
+fazer_reserva            52
+consultar_reserva        47
+horario_funcionamento    47
+cancelar_reserva         46
