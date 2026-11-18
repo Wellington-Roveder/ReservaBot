@@ -2,8 +2,11 @@ import inspect
 import logging
 import os
 import time
+import uuid
 
 import streamlit as st
+
+from services.telemetry import registrar_trace
 
 CAMINHO_ICONE = "assets/icone.png"
 ICONE = CAMINHO_ICONE if os.path.exists(CAMINHO_ICONE) else None
@@ -192,6 +195,38 @@ def renderizar_sidebar() -> None:
     with sb.container(border=True):
         painel_telemetria(st.session_state.ultima_telemetria)
 
+    sb.markdown("### LLMOps & Observabilidade")
+    with sb.container(border=True):
+        trace = st.session_state.get("ultimo_trace")
+        if not trace:
+            st.caption("Envie uma mensagem para visualizar o trace.")
+        else:
+            st.markdown(f"**Trace ID:** `{trace.get('trace_id', 'N/A')}`")
+            st.markdown(f"**Iterações LLM:** `{trace.get('iteracoes_llm', 0)}`")
+
+            col_tok, col_custo = sb.columns(2) if "sb" in locals() else st.columns(2)
+            # Usando st.columns normal dentro do container da sidebar:
+            c1, c2 = st.columns([1, 1.2])
+            c1.metric("Tokens", f"{trace.get('total_tokens', 0):,}".replace(",", "."))
+            c2.metric("Custo (USD)", f"${trace.get('custo_estimado_usd', 0.0):.4f}")
+
+            st.caption(
+                f"Prompt: {trace.get('prompt_tokens', 0)} | "
+                f"Completion: {trace.get('completion_tokens', 0)} | "
+                f"Latência: {trace.get('latencia_total_ms', 0)} ms"
+            )
+
+            tools = trace.get("tools_acionadas", [])
+            if tools:
+                st.markdown("**Ferramentas acionadas:**")
+                for idx, t in enumerate(tools, start=1):
+                    icone = "✅" if t.get("sucesso") else "⚠️"
+                    st.markdown(
+                        f"{idx}. {icone} `{t.get('nome')}` ({t.get('duracao_ms')} ms)"
+                    )
+            else:
+                st.markdown("**Ferramentas acionadas:** Nenhuma")
+
     sb.markdown("### Banco de reservas")
     with sb.container(border=True):
         painel_reservas()
@@ -239,8 +274,8 @@ def responder(prompt: str, nlu, llm, aceita_on_step: bool) -> str:
     """Classifica a mensagem, decide o caminho e devolve a resposta do assistente."""
     primeira_mensagem = len(st.session_state.messages) == 1
     inicio = time.perf_counter()
+    trace_id = str(uuid.uuid4())[:8]
 
-    # Um único `with` para o balão e o painel de etapas (sem aninhamento)
     with (
         st.chat_message("assistant", avatar=AVATARES["assistant"]),
         st.status("Processando solicitação...", expanded=True) as status,
@@ -257,23 +292,60 @@ def responder(prompt: str, nlu, llm, aceita_on_step: bool) -> str:
         estado, rotulo = "complete", "Resposta pronta"
 
         if bloqueada:
-            # Sem gastar chamada de API
             st.write("Fora do escopo: usando resposta padrão, sem chamar a API.")
             resposta = MENSAGEM_FORA_ESCOPO
+            latencia_total_ms = round((time.perf_counter() - inicio) * 1000, 2)
+
+            trace_turno = {
+                "trace_id": trace_id,
+                "intencao_detectada": intencao,
+                "confianca_nlu": round(float(score), 4),
+                "gatekeeper": "bloqueado",
+                "iteracoes_llm": 0,
+                "tools_acionadas": [],
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "total_tokens": 0,
+                "custo_estimado_usd": 0.0,
+                "latencia_llm_ms": 0.0,
+                "latencia_total_ms": latencia_total_ms,
+            }
         else:
             if not telemetria["in_scope"]:
                 st.write("Fluxo já em andamento: gatekeeper ignorado nesta mensagem.")
             st.write("Gerando resposta...")
             extra = {"on_step": st.write} if aceita_on_step else {}
             try:
-                resposta = llm.gerar_resposta(st.session_state.messages, **extra)
+                resposta = llm.gerar_resposta(
+                    st.session_state.messages, trace_id=trace_id, **extra
+                )
+                latencia_total_ms = round((time.perf_counter() - inicio) * 1000, 2)
+
+                trace_turno = {
+                    **getattr(llm, "ultimo_trace", {}),
+                    "intencao_detectada": intencao,
+                    "confianca_nlu": round(float(score), 4),
+                    "gatekeeper": "aprovado" if primeira_mensagem else "bypass",
+                    "latencia_total_ms": latencia_total_ms,
+                }
             except Exception:
-                # Detalhes só no log do servidor: não expõe erro técnico ao público
                 logger.exception("Falha ao gerar resposta")
                 resposta = MENSAGEM_ERRO
                 estado, rotulo = "error", "Falha ao consultar o sistema"
+                latencia_total_ms = round((time.perf_counter() - inicio) * 1000, 2)
+                trace_turno = {
+                    "trace_id": trace_id,
+                    "intencao_detectada": intencao,
+                    "confianca_nlu": round(float(score), 4),
+                    "gatekeeper": "erro",
+                    "erro": "Exceção na chamada da API",
+                    "latencia_total_ms": latencia_total_ms,
+                }
 
-        telemetria["latencia_s"] = time.perf_counter() - inicio
+        registrar_trace(trace_turno)
+        st.session_state["ultimo_trace"] = trace_turno
+
+        telemetria["latencia_s"] = latencia_total_ms / 1000.0
         status.update(label=rotulo, state=estado, expanded=estado == "error")
 
     return resposta

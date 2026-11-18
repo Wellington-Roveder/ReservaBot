@@ -1,6 +1,8 @@
 import json
 import logging
 import os
+import time
+import uuid
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -8,6 +10,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from repository import queries
+from services.telemetry import calcular_custo_estimado
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -33,6 +36,7 @@ class OpenAISystem:
         )
         self.model = os.getenv("MODEL_NAME")
         self.tools = self._carregar_tools()
+        self.ultimo_trace: dict = {}
 
     def _carregar_tools(self):
         # Resolve o caminho do tools.json relativo à pasta do openai_service.py
@@ -53,10 +57,10 @@ class OpenAISystem:
 
         Regras de atendimento:
         - Seu atendimento deve ser cordial e educado.
-        - Funcionamos de terça a domingo, das 18:00 às 02:00.
+        - Funcionamos de terça a domingo, das 18:00 às 02:00 (horários entre 00:00 e 01:59 pertencem ao encerramento do expediente noturno e são válidos).
         - Antes de chamar 'criar_reserva', sempre consulte 'buscar_mesas_livres' primeiro.
         - Se o cliente não informar telefone, nome, data, horário ou número de pessoas, peça os dados faltantes antes de executar a reserva.
-        - O Dia da Reserva sempre será o primeiro horário; reservas que viram o dia (entre 00:00 e 02:00) contam como dia anterior.
+        - Ao chamar 'buscar_mesas_livres' ou 'criar_reserva' para horários entre 00:00 e 01:59, passe exatamente a data do dia informado pelo cliente (ex: se o cliente pedir "amanhã às 00:30", passe a data de amanhã no formato AAAA-MM-DD; o sistema já trata a virada de dia internamente).
 
         Regras Inegociáveis:
         - Nunca oferecer promessas de descontos, nem discutir valores.
@@ -71,7 +75,39 @@ class OpenAISystem:
         3. Só execute 'cancelar_reserva' após o cliente confirmar explicitamente qual reserva deseja cancelar E o nome informado bater com o registro da reserva escolhida.
         """
 
-    def gerar_resposta(self, historico_mensagem: list) -> str:
+    def _registrar_ultimo_trace(
+        self,
+        trace_id: str,
+        inicio_turno: float,
+        iteracoes: int,
+        tools_executadas: list[dict],
+        prompt_tokens: int,
+        completion_tokens: int,
+        limite_atingido: bool = False,
+    ) -> None:
+        latencia_ms = round((time.perf_counter() - inicio_turno) * 1000, 2)
+        total_tokens = prompt_tokens + completion_tokens
+        self.ultimo_trace = {
+            "trace_id": trace_id,
+            "modelo": self.model,
+            "iteracoes_llm": iteracoes,
+            "tools_acionadas": tools_executadas,
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+            "custo_estimado_usd": calcular_custo_estimado(
+                self.model, prompt_tokens, completion_tokens
+            ),
+            "latencia_llm_ms": latencia_ms,
+            "limite_iteracoes_atingido": limite_atingido,
+        }
+
+    def gerar_resposta(
+        self, historico_mensagem: list, trace_id: str | None = None
+    ) -> str:
+        inicio_turno = time.perf_counter()
+        trace_id = trace_id or str(uuid.uuid4())[:8]
+
         mapa_funcoes = {
             "listar_mesas": queries.listar_mesas,
             "buscar_mesas_livres": queries.buscar_mesas_livres,
@@ -86,6 +122,9 @@ class OpenAISystem:
 
         max_iteracoes = 5
         iteracoes = 0
+        prompt_tokens_total = 0
+        completion_tokens_total = 0
+        tools_executadas: list[dict] = []
 
         while iteracoes < max_iteracoes:
             iteracoes += 1
@@ -98,9 +137,25 @@ class OpenAISystem:
                 temperature=0.3,
                 max_tokens=500,
             )
+
+            usage = getattr(response, "usage", None)
+            if usage is not None:
+                prompt_tokens_total += int(getattr(usage, "prompt_tokens", 0) or 0)
+                completion_tokens_total += int(
+                    getattr(usage, "completion_tokens", 0) or 0
+                )
+
             mensagem_ia = response.choices[0].message
 
             if not mensagem_ia.tool_calls:
+                self._registrar_ultimo_trace(
+                    trace_id=trace_id,
+                    inicio_turno=inicio_turno,
+                    iteracoes=iteracoes,
+                    tools_executadas=tools_executadas,
+                    prompt_tokens=prompt_tokens_total,
+                    completion_tokens=completion_tokens_total,
+                )
                 return mensagem_ia.content
 
             mensagens_envio.append(mensagem_ia)
@@ -108,24 +163,44 @@ class OpenAISystem:
             for tool_call in mensagem_ia.tool_calls:
                 name = tool_call.function.name
                 funcao = mapa_funcoes.get(name)
+                inicio_tool = time.perf_counter()
+                sucesso_tool = True
 
                 # Qualquer falha vira um resultado de erro devolvido ao modelo,
                 # que pode se corrigir, em vez de derrubar o chat.
                 try:
                     if not funcao:
+                        sucesso_tool = False
                         resultado = {"erro": f"Função '{name}' não encontrada."}
                     else:
                         args = json.loads(tool_call.function.arguments)
                         resultado = funcao(**args)
+                        if (
+                            isinstance(resultado, dict)
+                            and resultado.get("status") == "erro"
+                        ):
+                            sucesso_tool = False
                 except json.JSONDecodeError:
+                    sucesso_tool = False
                     resultado = {
                         "erro": f"Argumentos de '{name}' em JSON inválido. Tente novamente."
                     }
                 except TypeError as e:
+                    sucesso_tool = False
                     resultado = {"erro": f"Argumentos incorretos para '{name}': {e}"}
                 except Exception:
+                    sucesso_tool = False
                     logger.exception("Falha ao executar a tool '%s'", name)
                     resultado = {"erro": f"Falha interna ao executar '{name}'."}
+
+                duracao_tool_ms = round((time.perf_counter() - inicio_tool) * 1000, 2)
+                tools_executadas.append(
+                    {
+                        "nome": name,
+                        "duracao_ms": duracao_tool_ms,
+                        "sucesso": sucesso_tool,
+                    }
+                )
 
                 mensagens_envio.append(
                     {
@@ -136,4 +211,13 @@ class OpenAISystem:
                     }
                 )
 
+        self._registrar_ultimo_trace(
+            trace_id=trace_id,
+            inicio_turno=inicio_turno,
+            iteracoes=iteracoes,
+            tools_executadas=tools_executadas,
+            prompt_tokens=prompt_tokens_total,
+            completion_tokens=completion_tokens_total,
+            limite_atingido=True,
+        )
         return "Desculpe, atingi o limite de tentativas para processar sua solicitação. Pode tentar novamente?"

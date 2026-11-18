@@ -1,0 +1,43 @@
+================================================================================
+AVALIAÇÃO PONTA A PONTA DO AGENTE (LLM EVAL) - RESERVABOT
+Modelo: nvidia/nemotron-3-ultra-550b-a55b:free | Casos: 16
+================================================================================
+[TC01] PASS | Reserva completa com todos os dados na primeira mensagem
+   - Tools: OK (['buscar_mesas_livres', 'criar_reserva'])
+   - Args : OK
+   - Banco: Reservas: 0 -> 1 (esperado +1)
+[TC02] PASS | Reserva com telefone contendo código do país +55 e espaços
+   - Tools: OK (['buscar_mesas_livres', 'criar_reserva'])
+   - Args : OK
+   - Banco: Reservas: 0 -> 1 (esperado +1)
+[TC03] FAIL | Reserva na madrugada (00:30) pertencente ao expediente do dia informado
+   - Tools: Esperava ['buscar_mesas_livres', 'criar_reserva'], mas chamou ['buscar_mesas_livres']
+   - Args : Tool 'criar_reserva' não foi chamada
+   - Banco: Reservas: 0 -> 0 (esperado +1)
+[TC04] PASS | Criação em dois turnos (consulta disponibilidade primeiro, depois fornece dados)
+   - Tools: OK (['buscar_mesas_livres', 'criar_reserva', 'criar_reserva'])
+   - Args : OK
+   - Banco: Reservas: 0 -> 1 (esperado +1)
+[TC05] PASS | Pedido de reserva sem nome e sem telefone não deve chamar criar_reserva
+   - Tools: OK (['buscar_mesas_livres'])
+   - Args : OK
+   - Banco: N/A
+[TC06] ERRO DE EXECUÇÃO: Error code: 429 - Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day: https://openrouter.ai/settings/credits?utm_source=api&utm_campaign=free_daily_limit
+[TC07] ERRO DE EXECUÇÃO: Error code: 429 - Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day: https://openrouter.ai/settings/credits?utm_source=api&utm_campaign=free_daily_limit
+[TC08] ERRO DE EXECUÇÃO: Error code: 429 - Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day: https://openrouter.ai/settings/credits?utm_source=api&utm_campaign=free_daily_limit
+[TC09] ERRO DE EXECUÇÃO: Error code: 429 - Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day: https://openrouter.ai/settings/credits?utm_source=api&utm_campaign=free_daily_limit
+[TC10] ERRO DE EXECUÇÃO: Error code: 429 - Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day: https://openrouter.ai/settings/credits?utm_source=api&utm_campaign=free_daily_limit
+[TC11] ERRO DE EXECUÇÃO: Error code: 429 - Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day: https://openrouter.ai/settings/credits?utm_source=api&utm_campaign=free_daily_limit
+[TC12] ERRO DE EXECUÇÃO: Error code: 429 - Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day: https://openrouter.ai/settings/credits?utm_source=api&utm_campaign=free_daily_limit
+[TC13] ERRO DE EXECUÇÃO: Error code: 429 - Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day: https://openrouter.ai/settings/credits?utm_source=api&utm_campaign=free_daily_limit
+[TC14] ERRO DE EXECUÇÃO: Error code: 429 - Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day: https://openrouter.ai/settings/credits?utm_source=api&utm_campaign=free_daily_limit
+[TC15] ERRO DE EXECUÇÃO: Error code: 429 - Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day: https://openrouter.ai/settings/credits?utm_source=api&utm_campaign=free_daily_limit
+[TC16] ERRO DE EXECUÇÃO: Error code: 429 - Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day: https://openrouter.ai/settings/credits?utm_source=api&utm_campaign=free_daily_limit
+
+================================================================================
+RESUMO DAS MÉTRICAS (LLM EVAL)
+================================================================================
+Tool Selection Accuracy      :  25.00% (4/16 casos)
+Argument Extraction Accuracy :  80.00% (4/5 casos com extração)
+Task Completion Rate         :  75.00% (3/4 reservas gravadas)
+================================================================================
