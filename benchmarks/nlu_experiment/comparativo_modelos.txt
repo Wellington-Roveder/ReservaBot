@@ -1,0 +1,65 @@
+=== COMPARATIVO DE MODELOS NLU (TESTE CEGO: 44 MENSAGENS) ===
+Melhor config validação -> C=1.0, threshold=0.35 (F1-Macro Val: 1.0000)
+
+--- 1. BASELINE: SemanticNLU (Cosseno + intents.json, threshold=0.50) ---
+Accuracy: 0.7955 | F1-Macro: 0.8081
+Latência por mensagem -> p50: 9.41 ms | p95: 12.73 ms
+                       precision    recall  f1-score   support
+
+        fazer_reserva     0.5833    0.8750    0.7000         8
+    consultar_reserva     0.8571    0.8571    0.8571         7
+     cancelar_reserva     0.7500    0.8571    0.8000         7
+horario_funcionamento     0.8750    1.0000    0.9333         7
+       fora_de_escopo     1.0000    0.6000    0.7500        15
+
+             accuracy                         0.7955        44
+            macro avg     0.8131    0.8379    0.8081        44
+         weighted avg     0.8419    0.7955    0.7951        44
+
+Matriz de Confusão (linhas=real, colunas=predito):
+                       fazer_reserva  consultar_reserva  cancelar_reserva  horario_funcionamento  fora_de_escopo
+fazer_reserva                      7                  1                 0                      0               0
+consultar_reserva                  0                  6                 1                      0               0
+cancelar_reserva                   1                  0                 6                      0               0
+horario_funcionamento              0                  0                 0                      7               0
+fora_de_escopo                     4                  0                 1                      1               9
+
+--- 2. CLASSIFICADOR TREINADO: LogisticRegression sobre MiniLM-L12 ---
+Accuracy: 0.8636 | F1-Macro: 0.8698
+Latência por mensagem -> p50: 14.67 ms | p95: 51.02 ms
+Tamanho do artefato: 8.80 KB
+                       precision    recall  f1-score   support
+
+        fazer_reserva     1.0000    0.7500    0.8571         8
+    consultar_reserva     0.8571    0.8571    0.8571         7
+     cancelar_reserva     1.0000    1.0000    1.0000         7
+horario_funcionamento     0.6364    1.0000    0.7778         7
+       fora_de_escopo     0.9231    0.8000    0.8571        15
+
+             accuracy                         0.8636        44
+            macro avg     0.8833    0.8814    0.8698        44
+         weighted avg     0.8932    0.8636    0.8672        44
+
+Matriz de Confusão (linhas=real, colunas=predito):
+                       fazer_reserva  consultar_reserva  cancelar_reserva  horario_funcionamento  fora_de_escopo
+fazer_reserva                      6                  1                 0                      0               1
+consultar_reserva                  0                  6                 0                      1               0
+cancelar_reserva                   0                  0                 7                      0               0
+horario_funcionamento              0                  0                 0                      7               0
+fora_de_escopo                     0                  0                 0                      3              12
+
+=== ANÁLISE DE ERROS NO TESTE CEGO ===
+- Msg: 'Preciso desmarcar o jantar reservado' | Real: cancelar_reserva | Baseline: fazer_reserva | LogReg: cancelar_reserva
+- Msg: 'Tem promoção de happy hour?' | Real: fora_de_escopo | Baseline: fora_de_escopo | LogReg: horario_funcionamento
+- Msg: 'Vocês servem café da manhã?' | Real: fora_de_escopo | Baseline: fazer_reserva | LogReg: fora_de_escopo
+- Msg: 'Qual horário ficou agendado para mim?' | Real: consultar_reserva | Baseline: consultar_reserva | LogReg: horario_funcionamento
+- Msg: 'Bom dia, tudo bem com você?' | Real: fora_de_escopo | Baseline: fora_de_escopo | LogReg: horario_funcionamento
+- Msg: 'Quero reservar um carro na locadora' | Real: fora_de_escopo | Baseline: fazer_reserva | LogReg: fora_de_escopo
+- Msg: 'qro reserva mesa hj pra 2' | Real: fazer_reserva | Baseline: fazer_reserva | LogReg: fora_de_escopo
+- Msg: 'Pode fazer uma reserva para mim amanhã às 19h?' | Real: fazer_reserva | Baseline: consultar_reserva | LogReg: consultar_reserva
+- Msg: 'Quero elogiar o chef de cozinha' | Real: fora_de_escopo | Baseline: cancelar_reserva | LogReg: fora_de_escopo
+- Msg: 'Pode checar minha reserva para hoje?' | Real: consultar_reserva | Baseline: cancelar_reserva | LogReg: consultar_reserva
+- Msg: 'Vocês cobram 10% de serviço?' | Real: fora_de_escopo | Baseline: horario_funcionamento | LogReg: fora_de_escopo
+- Msg: 'Qual a previsão do tempo para hoje?' | Real: fora_de_escopo | Baseline: fora_de_escopo | LogReg: horario_funcionamento
+- Msg: 'Quero reservar um quarto de hotel para o fim de semana' | Real: fora_de_escopo | Baseline: fazer_reserva | LogReg: fora_de_escopo
+- Msg: 'Tem música ao vivo sexta à noite?' | Real: fora_de_escopo | Baseline: fazer_reserva | LogReg: fora_de_escopo
