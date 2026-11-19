@@ -45,7 +45,7 @@ Streamlit (app.py)
 
 `services/nlu_config/nlu.py` usa `fastembed` com o modelo `paraphrase-multilingual-MiniLM-L12-v2`. Os exemplos de intenção são transformados em embeddings e normalizados por L2; a classificação compara o embedding da mensagem com esses exemplos por produto escalar, equivalente à similaridade de cosseno após a normalização.
 
-O limiar padrão do roteador é `0.50`. Na primeira mensagem, uma classificação fora do escopo gera uma resposta padrão sem consumir uma chamada à API do LLM. Em mensagens posteriores, o gatekeeper pode ser ignorado para preservar fluxos multi-turno já iniciados. A aplicação exibe a intenção, o score de confiança, o status do gatekeeper e a latência na barra lateral. A escolha do limiar e o desempenho do roteador estão descritos em [Avaliação do roteador](#avaliação-do-roteador).
+O limiar padrão do roteador é `0.50`. Na primeira mensagem, uma classificação fora do escopo gera uma resposta padrão sem consumir uma chamada à API do LLM. Em mensagens posteriores, o gatekeeper pode ser ignorado para preservar fluxos multi-turno já iniciados. A aplicação exibe a intenção, o score de confiança, o status do gatekeeper e a latência na barra lateral. A escolha do limiar e o desempenho do roteador estão descritos em [Avaliação do roteador](#avaliação-do-roteador) e [Benchmark de classificadores NLU](#benchmark-de-classificadores-nlu).
 
 ### Orquestração com tool calling
 
@@ -94,6 +94,23 @@ O roteador foi avaliado em 80 mensagens rotuladas (40 dentro e 40 fora do escopo
 
 Conjunto de teste, metodologia, tabela de limiares, erros e limitações em [ADR 0001: Avaliação do roteador semântico](docs/adr/0001-avaliacao-do-roteador-semantico.md).
 
+## Benchmark de classificadores NLU
+
+Para verificar se um treinamento supervisionado justificaria alterar o runtime de produção, conduzi um experimento controlado em `benchmarks/nlu_experiment/` sobre um conjunto curado de 289 mensagens em português brasileiro, após deduplicação e filtro anti-*data leakage* (similaridade de cosseno igual ou superior a 0,92 contra o `intents.json`). O conjunto foi dividido de forma estratificada (`seed=42`) em 202 mensagens de treino, 43 de validação e 44 de teste cego.
+
+| Abordagem | Accuracy | F1-Macro | Recall `fora_de_escopo` | Latência p50 (CPU) | Artefato |
+| --- | --- | --- | --- | --- | --- |
+| Baseline (`SemanticNLU`) | 79,55% | 0,8081 | 60,00% (9/15) | 9,41 ms | 0 KB (JSON) |
+| `LogisticRegression` + MiniLM-L12 | 86,36% | 0,8698 | 80,00% (12/15) | 14,67 ms | 8,80 KB |
+| BERTimbau com fine-tuning (110M) | 81,82% | 0,7964 | 100,00% (15/15) | 111,92 ms | 416,20 MB |
+
+Com poucos dados (cerca de 200 exemplos), o fine-tuning completo do BERTimbau piorou o F1-Macro e multiplicou a latência em CPU por 7,6 frente à regressão logística sobre embeddings congelados. O runtime baseado em `fastembed` foi mantido sem alterações em `services/nlu_config/nlu.py`. O conjunto de dados e o classificador linear vencedor foram publicados no Hugging Face Hub como artefatos reproduzíveis:
+
+- Dataset Card: [wellington-roveder/reservabot-nlu-ptbr](https://huggingface.co/datasets/wellington-roveder/reservabot-nlu-ptbr)
+- Model Card: [wellington-roveder/reservabot-nlu-logreg-minilm](https://huggingface.co/wellington-roveder/reservabot-nlu-logreg-minilm)
+
+Decisão e limitações em [ADR 0005: Avaliação comparativa de classificadores NLU e decisão de runtime](docs/adr/0005-avaliacao-classificadores-nlu.md).
+
 ## Avaliação do agente
 
 O agente foi avaliado ponta a ponta em 16 cenários, com chamadas reais ao LLM (`nvidia/nemotron-3-ultra-550b-a55b:free`), SQLite em memória e relógio congelado. Resultados:
@@ -122,13 +139,22 @@ Cenários, métricas e análise das falhas em [ADR 0003: Avaliação ponta a pon
 │   ├── resultados.txt                  # Saída da avaliação do roteador
 │   ├── eval_agent.py                   # Avaliação ponta a ponta do agente (LLM Eval)
 │   ├── eval_agent_cases.json           # 16 cenários estruturados de teste do agente
-│   └── resultados_eval_agent.txt       # Saída da avaliação do agente
+│   ├── resultados_eval_agent.txt       # Saída da avaliação do agente
+│   └── nlu_experiment/                 # Experimento supervisionado (LogReg vs BERTimbau)
+│       ├── preparar_dataset.py         # Curadoria, filtro anti-leakage e splits estratificados
+│       ├── treinar_comparar.py         # Avaliação do baseline e regressão logística
+│       ├── treinar_bertimbau.py        # Fine-tuning do BERTimbau e benchmark de latência CPU
+│       ├── requirements-train.txt      # Dependências isoladas para treino em GPU
+│       ├── splits/                     # Partições train.csv, val.csv e test.csv
+│       ├── comparativo_modelos.txt     # Métricas baseline vs LogisticRegression
+│       └── resultados_bertimbau.txt    # Métricas e auditoria do BERTimbau
 ├── docs/
 │   └── adr/
 │       ├── 0001-avaliacao-do-roteador-semantico.md
 │       ├── 0002-revisao-de-seguranca.md
 │       ├── 0003-avaliacao-ponta-a-ponta-agente.md
-│       └── 0004-tracing-estruturado-e-observabilidade.md
+│       ├── 0004-tracing-estruturado-e-observabilidade.md
+│       └── 0005-avaliacao-classificadores-nlu.md
 ├── repository/
 │   ├── database.py                     # Pool simples de conexões SQLite por thread
 │   ├── queries.py                      # Schema, seed, validações e operações de reserva
@@ -169,7 +195,7 @@ Execute os testes com:
 pytest
 ```
 
-As avaliações do roteador e do agente são executadas separadamente, conforme descrito em [Avaliação do roteador](#avaliação-do-roteador) e [Avaliação do agente](#avaliação-do-agente).
+As avaliações do roteador e do agente são executadas separadamente, conforme descrito em [Avaliação do roteador](#avaliação-do-roteador), [Benchmark de classificadores NLU](#benchmark-de-classificadores-nlu) e [Avaliação do agente](#avaliação-do-agente).
 
 ## Execução local
 
