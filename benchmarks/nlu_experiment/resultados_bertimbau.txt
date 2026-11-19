@@ -1,0 +1,45 @@
+--- Auditoria de Integridade e Distribuição dos Splits ---
+                       train  val  test  total
+esperado                                      
+fazer_reserva             36    8     8     52
+consultar_reserva         33    7     7     47
+cancelar_reserva          32    7     7     46
+horario_funcionamento     33    7     7     47
+fora_de_escopo            68   14    15     97
+
+Threshold calibrado (validação, recall fora_de_escopo >= 0.85): 0.4 (F1-Macro Val: 0.8944 | Recall fora_de_escopo Val: 1.0000)
+Accuracy (Teste Cego): 0.8182 | F1-Macro (Teste Cego): 0.7964
+Latência CPU (10 warm-ups, 5x passagens) -> p50: 111.92 ms | p95: 139.12 ms | p99: 151.75 ms
+Tamanho total do artefato (recursivo): 416.20 MB
+
+                       precision    recall  f1-score   support
+
+        fazer_reserva     1.0000    0.8750    0.9333         8
+    consultar_reserva     0.6667    0.5714    0.6154         7
+     cancelar_reserva     1.0000    0.4286    0.6000         7
+horario_funcionamento     1.0000    1.0000    1.0000         7
+       fora_de_escopo     0.7143    1.0000    0.8333        15
+
+             accuracy                         0.8182        44
+            macro avg     0.8762    0.7750    0.7964        44
+         weighted avg     0.8496    0.8182    0.8062        44
+
+Matriz de Confusão (linhas=real, colunas=predito):
+                       fazer_reserva  ...  fora_de_escopo
+fazer_reserva                      7  ...               1
+consultar_reserva                  0  ...               3
+cancelar_reserva                   0  ...               2
+horario_funcionamento              0  ...               0
+fora_de_escopo                     0  ...              15
+
+[5 rows x 5 columns]
+
+=== ERROS DO BERTIMBAU NO TESTE CEGO ===
+- Msg: 'Verifica se tem algum agendamento no meu cadastro' | Real: consultar_reserva | BERTimbau: fora_de_escopo
+- Msg: 'Preciso desmarcar o jantar reservado' | Real: cancelar_reserva | BERTimbau: fora_de_escopo
+- Msg: 'Qual horário ficou agendado para mim?' | Real: consultar_reserva | BERTimbau: fora_de_escopo
+- Msg: 'Pode fazer uma reserva para mim amanhã às 19h?' | Real: fazer_reserva | BERTimbau: fora_de_escopo
+- Msg: 'Desmarcar reserva de hoje' | Real: cancelar_reserva | BERTimbau: consultar_reserva
+- Msg: 'Pode cancelar apenas uma das minhas reservas?' | Real: cancelar_reserva | BERTimbau: consultar_reserva
+- Msg: 'Pode confirmar se o agendamento deu certo?' | Real: consultar_reserva | BERTimbau: fora_de_escopo
+- Msg: 'Infelizmente vou precisar cancelar a mesa de sexta' | Real: cancelar_reserva | BERTimbau: fora_de_escopo
